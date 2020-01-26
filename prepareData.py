@@ -15,5 +15,34 @@ else:
     print('Requête correctement effectuée. \n {}'.format(r.url))
     r_json = r.json()
 
-products = r_json['products']
-items = r_param['fields']
+products_list = r_json['products']
+products_list.append(dict({'product_name=test': 'test', 'nutrition_grade_fr': ''}))
+print("Nombre de produits initial: {}".format(len(products_list)))
+print(products_list)
+criteria = r_param['fields'].split(',')  # getting a list of criteria from the 'fields' parameter
+print("{a} critères retenus par produit. \n {b}. \n".format(a=len(criteria), b=criteria))
+
+# # reject any product without defined criteria
+# for i in range(len(products_list)):
+#     if len(products_list[i]) < len(criteria):
+#         print("Produit(s) non conforme(s): \n {}".format(products_list[i]))
+#         del products_list[i]
+# print("Nombre de produits final: {}".format(len(products_list)))
+# print(products_list)
+
+# reject any product without a value for every specific criterion
+incorrect_items = []
+for i in range(len(products_list)):
+    temp = products_list[i].values()
+    if '' in temp:
+        print("Ce produit a été retiré: \n {}".format(products_list[i]))
+        incorrect_items.append(i)
+
+for item in incorrect_items:
+    del products_list[item]  # ne peux pas supprimer successivement sur les index car ceux ci changent !
+
+print("Nombre de produits final: {}".format(len(products_list)))
+print(products_list)
+
+
+
