@@ -15,7 +15,7 @@ class FoodAPI:
         self.param['tag_0'] = categ
         self.param['page_size'] = qt
 
-        try:
+        try:  # TODO: look for better handling of ConnectionError (requests.exceptions.ConnectionError)
             r = requests.get(self.url, params=self.param)
             assert r.ok  # check status 200 for the request
         except AssertionError:
