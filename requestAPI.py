@@ -15,21 +15,21 @@ class FoodAPI:
         self.param['tag_0'] = categ
         self.param['page_size'] = qt
 
-        try:  # TODO: look for better handling of ConnectionError (requests.exceptions.ConnectionError)
+        try:
             r = requests.get(self.url, params=self.param)
-            assert r.ok  # check status 200 for the request
-        except AssertionError:
-            print('Echec de de la requête, avec code status HTTP {}'.format(r.status_code))
+        except ConnectionError:
+            raise ConnectionError("Echec de de la requête: problème de connexion on dirait...")
 
-        else:
-            print('Requête correctement effectuée vers \n {}'.format(r.url))
-            self.json = r.json()
+        assert r.ok, "Echec de de la requête, avec code status HTTP {}".format(r.status_code)  # check status 200 for the request
+        print("Requête correctement effectuée vers: \n {} \n".format(r.url))
+
+        self.json = r.json()
 
 
 def main(categ, qt='10'):
-    API = FoodAPI()
-    API.call_for(categ, qt)
-    print(API.json)
+    api = FoodAPI()
+    api.call_for(categ, qt)
+    print("Voici le json récupéré: \n {}".format(api.json))
 
 
 if __name__ == '__main__':
