@@ -24,6 +24,7 @@ class Parser:
     @staticmethod
     def find_invalid_value(p_list):
         """Find product with no values for mandatory keys.
+        Require a list of product in argument.
         Return list of indexes of products with incorrect values."""
         to_delete = []  # list of indexes of incorrect products
 
@@ -51,6 +52,7 @@ class Parser:
 
     def find_incorrect_product(self, p_list):
         """Look for products in a list of products that haven't got the correct number of criteria.
+        Require a p_list param which the list of product to iterate upon.
         Return a list of indexes."""
         to_delete = []  # list of indexes of incorrect products
 
@@ -64,6 +66,8 @@ class Parser:
 
     def delete_incorrect(self, index_list):
         """Suppress products from the products list based on the index list.
+        Require a index_list param which is a list of integers representing the indexes of product to be deleted
+        in the products_list.
         Return a list of products."""
         index_list.sort(reverse=True)  # sort index in desc order for proper use with str.pop() method
         for i in index_list:
@@ -86,7 +90,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-

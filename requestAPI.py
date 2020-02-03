@@ -3,7 +3,7 @@ import requests
 
 class FoodAPI:
     def __init__(self):
-        """defining base url and parameters for using OpenFoodFacts API"""
+        """defining the base url and parameters for using OpenFoodFacts API"""
         self.url = 'https://fr.openfoodfacts.org./cgi/search.pl'
         self.param = {'action': 'process', 'tagtype_0': 'categories', 'tag_contains_0': 'contains', 'tag_0': '',
                         'sort_by': 'unique_scans_n', 'page_size': '', 'json': 'true', 'fields':
@@ -11,7 +11,8 @@ class FoodAPI:
         self.json = {}
 
     def call_for(self, categ, qt='10'):
-        """API call for a specific category"""
+        """API call for a specific category. Require a 'categ' param (which corresponds to the category of food
+        that is queried and) a 'qt' param (qt for quantity of products for the queried category)."""
         self.param['tag_0'] = categ
         self.param['page_size'] = qt
 
@@ -34,12 +35,3 @@ def main(categ, qt='10'):
 
 if __name__ == '__main__':
     main('snack')
-
-
-
-
-
-
-
-
-
