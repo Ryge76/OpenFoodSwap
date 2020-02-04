@@ -8,12 +8,14 @@ class FoodAPI:
         self.param = {'action': 'process', 'tagtype_0': 'categories', 'tag_contains_0': 'contains', 'tag_0': '',
                         'sort_by': 'unique_scans_n', 'page_size': '', 'json': 'true', 'fields':
                             'product_name,image_url,nutrition_grade_fr,purchase_places,stores,url,ingredients_text_fr,allergens'}
+        self.category = ''
         self.json = {}
 
     def call_for(self, categ, qt='10'):
         """API call for a specific category. Require a 'categ' param (which corresponds to the category of food
         that is queried and) a 'qt' param (qt for quantity of products for the queried category)."""
         self.param['tag_0'] = categ
+        self.category = categ
         self.param['page_size'] = qt
 
         try:
@@ -25,6 +27,10 @@ class FoodAPI:
         print("Requête correctement effectuée vers: \n {} \n".format(r.url))
 
         self.json = r.json()
+        FoodAPI.add_category(self)
+
+    def add_category(self):
+        self.json.update({'categ_name': self.category})
 
 
 def main(categ, qt='10'):
@@ -34,4 +40,4 @@ def main(categ, qt='10'):
 
 
 if __name__ == '__main__':
-    main('snack')
+    main('snacks')

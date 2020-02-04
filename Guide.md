@@ -24,3 +24,20 @@
     - BD du prog à consulter
 
 
+# **Difficultées rencontrées**
+*API OFF*
+- Compréhension de l'organisation de l'API OFF. De multiples critères non forcément bien renseignés ni renvoyé dans
+le même ordre par l'API => impact sur le traitement des données extraites par la suite
+
+- Utilisation du module Requests et paramétrage pour obtenir une quantité controlée de produits, avec que certains 
+critères en particulier. En particulier il a fallut trouver la bonne façon d'écrire le paramètre fields pour 
+qu'il intègre tous les critères voulus.
+
+- Implémentation de la classe
+
+*Base de donnée*
+- Import du module msql-connector-python. Porte un nom qui n'est pas le même sous lequel il est utilisé dans 
+le programme. Par ailleurs quelque difficulté d'installation dans l'environnement pipenv.
+
+- Définir l'ordre d'intégration des données. D'abord les catégories de produits. Ensuite les produits auxquels
+il faut intégrer la catégorie à laquelle ils correspondent.

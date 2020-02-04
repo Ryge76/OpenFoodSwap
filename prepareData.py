@@ -9,6 +9,7 @@ class Parser:
     def __init__(self, data):
         self.criteria = data.param['fields'].split(',')  # getting list of criteria
         self.products_list = data.json['products']  # getting list of product
+        self.category = data.json['categ_name']
         self.final_result = []
 
     @staticmethod
@@ -37,18 +38,11 @@ class Parser:
         print("Index des produits à supprimer: \n {} \n".format(to_delete))
         return to_delete
 
-    def prepare_data(self):
-        """Implements the parsing logic with successive calls to internal methods"""
-        print("Le jeu initial de données contient {} produits. \n".format(len(self.products_list)))
-
-        incorrect_idx = Parser.find_incorrect_product(self, self.products_list)  # step 1: identifying index of incomplete products
-        complete_products_only = Parser.delete_incorrect(self, incorrect_idx)  # step 2: remove unwanted products
-        incorrect_idx = Parser.find_invalid_value(complete_products_only)  # step 3: identifying index of products with invalid values
-        self.final_result = Parser.delete_incorrect(self, incorrect_idx)  # step 4 = step 2
-
-        print("Le jeu final de données contient {} produits. \n".format(len(self.final_result)))
-
-        return self.final_result
+    def add_category(self):
+        """Add category tag to each valid product to identify their category."""
+        for product in self.products_list:
+            product.update({'categ_name': self.category})
+        return self.products_list
 
     def find_incorrect_product(self, p_list):
         """Look for products in a list of products that haven't got the correct number of criteria.
@@ -66,7 +60,7 @@ class Parser:
 
     def delete_incorrect(self, index_list):
         """Suppress products from the products list based on the index list.
-        Require a index_list param which is a list of integers representing the indexes of product to be deleted
+        Require a idx_list param which is a list of integers representing the indexes of product to be deleted
         in the products_list.
         Return a list of products."""
         index_list.sort(reverse=True)  # sort index in desc order for proper use with str.pop() method
@@ -75,12 +69,27 @@ class Parser:
         print("Les produits ont correctement été supprimés. \n")
         return self.products_list
 
+    def prepare_data(self):
+        """Implements the parsing logic with successive calls to internal methods"""
+        print("Le jeu initial de données contient {} produits. \n".format(len(self.products_list)))
+
+        incorrect_idx = Parser.find_incorrect_product(self, self.products_list)  # step 1: identifying index of incomplete products
+        complete_products_only = Parser.delete_incorrect(self, incorrect_idx)  # step 2: remove unwanted products
+        incorrect_idx = Parser.find_invalid_value(complete_products_only)  # step 3: identifying index of products with invalid values
+        Parser.delete_incorrect(self, incorrect_idx)  # step 4 removing product with invalid value for keys
+
+        self.final_result = Parser.add_category(self)  # adding category tag to each product
+
+        print("Le jeu final de données contient {} produits. \n".format(len(self.final_result)))
+
+        return self.final_result
+
 
 def main():
     # creating a FoodAPI object required to use Parser
     from requestAPI import FoodAPI
     data_set = FoodAPI()
-    data_set.call_for('snack', qt='50')
+    data_set.call_for('snacks', qt='50')
 
     # parsing data
     parser = Parser(data_set)
