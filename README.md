@@ -7,7 +7,7 @@ Simple Foods swapping app based OpenFoodsFacts DB.
 
 User have two options:
 
-1. Search the DB for a food he wants to match an healthier equivalent
+1. Search the DB for some food he wants to match an healthier equivalent
 2. Look back into his previous searches
 
 This app should be usable via simple cli or complete GUI.

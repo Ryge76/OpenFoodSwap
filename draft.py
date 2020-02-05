@@ -92,7 +92,8 @@ cursor = cnx.cursor()
 # #
 # # cnx.commit()
 
-# populate products table
+
+# find id for requested category
 find_category_id = ("SELECT id FROM categories "
                     "WHERE categ_name = %s")
 
@@ -100,30 +101,30 @@ categ_search = ['snacks']
 
 cursor_id = cnx.cursor(buffered=True)
 cursor_id.execute(find_category_id, categ_search)
-id_number = list(cursor_id.fetchone()).pop()  # in this case fetchone() returns a tuple with a single element
-print(id_number)
+id_number = list(cursor_id.fetchone()).pop()  # get only the integer value of cursor_id
+print("\n Pour la catégorie {}, l'id est {}.".format(categ_search, id_number))
 
-
-# TODO: how to get info from cursor_id ??
+# ad category_id to every products in the dataset
 for product in data_set:
     product.update({'category_id': id_number})
 
-print(data_set)
+# print(data_set)
 
+# populate products table
 add_products = ("INSERT INTO products "
-                "(category_id, product_name, image_url, nutrition_grade_fr, ingredients_text_fr, allergens,"
+                "(category_id, product_name, url, image_url, nutrition_grade_fr, ingredients_text, allergens, "
                 "stores, purchase_places) "
                 "VALUES (%(category_id)s, %(product_name)s, %(url)s, %(image_url)s, %(nutrition_grade_fr)s, "
                 "%(ingredients_text_fr)s, %(allergens)s, %(stores)s, %(purchase_places)s)")
 
 
 for product in data_set:
-    cursor.execute(add_products, product)
-    # try:
-    #     cursor.execute(add_products, product)
-    #     print("{} a été ajouté à la table des produits.".format(product['product_name']))
-    # except:
-    #     print("{} n'a pas été ajouté à la table des produits suite à une erreur.".format(product['product_name']))
+    # cursor.execute(add_products, product)
+    try:
+        cursor.execute(add_products, product)
+        print("{} a été ajouté à la table des produits.".format(product['product_name']))
+    except mysql.connector.Error as e:
+        print("{} n'a pas été ajouté à la table des produits suite à cette erreur: \n {}.".format(product['product_name']), e)
 
 cnx.commit()
 
