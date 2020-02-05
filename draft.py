@@ -71,24 +71,50 @@ cleaned_final = delete_incorrect(cleaned, missing_values)  # get the final list 
 
 print("La liste finale comporte {} produits. \n {}".format(len(cleaned_final), cleaned_final))
 
+data_set = cleaned_final.copy()
+
 # initiating the OFS DB
 cnx = mc.connect(**config.db_access)
 cursor = cnx.cursor()
 
-data_set = cleaned_final.copy()
-categories = ['fruits', 'legumes', 'produits laitiers', 'viandes', 'poissons', 'boissons', 'cereales', 'petit dej',
-              'snacks']
+# # populate categories table
+# categories = ['fruits', 'legumes', 'produits laitiers', 'viandes', 'poissons', 'boissons', 'cereales', 'petit dej',
+#               'snacks']
 
-add_category = ("INSERT INTO categories"
-                "VALUES (%s, %s)")
+# add_category = ("INSERT INTO categories "
+#                 "VALUES (%s, %s)")
+#
+# delete_categories = ("DELETE FROM categories")
+# cursor.execute(delete_categories)
+#
+# for category in categories:
+#     cursor.execute(add_category, (None, category))
 
-add_products = ("INSERT INTO products"
+
+# populate products table
+find_category_id = ("SELECT id FROM categories "
+                    "WHERE categ_name = %s ")
+
+categ_search = 'produits laitiers'
+
+cursor_id = cnx.cursor(buffered=True)
+cursor_id.execute(find_category_id, categ_search)
+
+
+for product in data_set:
+    data_set.update({'category_id': cursor_id})
+
+print(data_set)
+
+add_products = ("INSERT INTO products "
                 "VALUES (%(category_id)s, %(product_name)s, %(url)s, %(image_url)s, %(nutrition_grade)s, "
-                "%(ingredients_text)s, %(allergens)s, %(stores)s, %(pruchase_places)s)")
-
-data_set.update()
+                "%(ingredients_text)s, %(allergens)s, %(stores)s, %(purchase_places)s)")
 
 
+for product in data_set:
+    cursor.execute(add_products, product)
+
+cnx.commit()
 
 
 
