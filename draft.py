@@ -77,32 +77,34 @@ data_set = cleaned_final.copy()
 cnx = mc.connect(**config.db_access)
 cursor = cnx.cursor()
 
-# # populate categories table
+# populate categories table
 # categories = ['fruits', 'legumes', 'produits laitiers', 'viandes', 'poissons', 'boissons', 'cereales', 'petit dej',
 #               'snacks']
-
+#
 # add_category = ("INSERT INTO categories "
 #                 "VALUES (%s, %s)")
 #
-# delete_categories = ("DELETE FROM categories")
-# cursor.execute(delete_categories)
+# # delete_categories = ("DELETE FROM categories")
+# # cursor.execute(delete_categories)
 #
-# for category in categories:
-#     cursor.execute(add_category, (None, category))
-
+# # for category in categories:
+# #     cursor.execute(add_category, (None, category))
+# #
+# # cnx.commit()
 
 # populate products table
 find_category_id = ("SELECT id FROM categories "
-                    "WHERE categ_name = %s ")
+                    "WHERE categ_name = %s")
 
-categ_search = 'produits laitiers'
+categ_search = ['snacks']
 
 cursor_id = cnx.cursor(buffered=True)
 cursor_id.execute(find_category_id, categ_search)
 
-
+# TODO: how to get info from cursor_id ??
 for product in data_set:
-    data_set.update({'category_id': cursor_id})
+    number = id in cursor_id
+    product.update({'category_id': number})
 
 print(data_set)
 
