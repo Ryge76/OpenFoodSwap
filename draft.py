@@ -74,7 +74,7 @@ print("La liste finale comporte {} produits. \n {}".format(len(cleaned_final), c
 data_set = cleaned_final.copy()
 
 # initiating the OFS DB
-cnx = mc.connect(**config.db_access)
+cnx = mc.connect(**config.db_access_testing)
 cursor = cnx.cursor()
 
 # populate categories table
@@ -100,21 +100,30 @@ categ_search = ['snacks']
 
 cursor_id = cnx.cursor(buffered=True)
 cursor_id.execute(find_category_id, categ_search)
+id_number = list(cursor_id.fetchone()).pop()  # in this case fetchone() returns a tuple with a single element
+print(id_number)
+
 
 # TODO: how to get info from cursor_id ??
 for product in data_set:
-    number = id in cursor_id
-    product.update({'category_id': number})
+    product.update({'category_id': id_number})
 
 print(data_set)
 
 add_products = ("INSERT INTO products "
-                "VALUES (%(category_id)s, %(product_name)s, %(url)s, %(image_url)s, %(nutrition_grade)s, "
-                "%(ingredients_text)s, %(allergens)s, %(stores)s, %(purchase_places)s)")
+                "(category_id, product_name, image_url, nutrition_grade_fr, ingredients_text_fr, allergens,"
+                "stores, purchase_places) "
+                "VALUES (%(category_id)s, %(product_name)s, %(url)s, %(image_url)s, %(nutrition_grade_fr)s, "
+                "%(ingredients_text_fr)s, %(allergens)s, %(stores)s, %(purchase_places)s)")
 
 
 for product in data_set:
     cursor.execute(add_products, product)
+    # try:
+    #     cursor.execute(add_products, product)
+    #     print("{} a été ajouté à la table des produits.".format(product['product_name']))
+    # except:
+    #     print("{} n'a pas été ajouté à la table des produits suite à une erreur.".format(product['product_name']))
 
 cnx.commit()
 

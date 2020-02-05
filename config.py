@@ -16,6 +16,7 @@ db_access = {
     'user': select_user(),
     'password': input("Saisissez le mot de passe pour cet utilisateur:  ")
 }
+
 # for testing access to the database
 db_access_testing = {
     'host': 'localhost',
