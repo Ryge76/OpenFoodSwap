@@ -1,4 +1,5 @@
-import mysql.connector
+import mysql.connector as mc
+import config
 
 """
 Etpaes:
@@ -11,4 +12,10 @@ Etpaes:
 5. 
 """
 
+
+class DBAccess:
+    """Manage access to the OFS database.
+    Provide functions to add data in the db and query those data"""
+    def __init__(self):
+        self.cnx = mc.connect(**config.db_access_testing)
 

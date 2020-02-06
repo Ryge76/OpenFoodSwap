@@ -79,33 +79,29 @@ cnx = mc.connect(**config.db_access_testing)
 
 
 # populate categories table
-categories = [(None, 'fruits'), (None, 'legumes'), (None, 'produits laitiers'), (None, 'viandes'),
-              (None, 'poissons'), (None, 'boissons'), (None, 'cereales'), (None, 'petit dej'),
-              (None, 'snacks')]
+# categories = [(None, 'fruits'), (None, 'legumes'), (None, 'produits laitiers'), (None, 'viandes'),
+#               (None, 'poissons'), (None, 'boissons'), (None, 'cereales'), (None, 'petit dej'),
+#               (None, 'snacks')]
+categories = ['fruits', 'legumes', 'produits laitiers', 'viandes', 'poissons', 'boissons', 'cereales', 'petit dej',
+              'snacks']
 
 add_category = ("INSERT INTO categories "
-                "VALUES (%s, %s)")
+                "(categ_name) "
+                "VALUES (%s)")
 
 cursor = cnx.cursor()
-try:
-    print("\n Essai d'insertion en masse des categories... \n")
-    cursor.executemany(add_category, categories)
-
-
-except mc.errors.IntegrityError as e:
-    print("\n Suite à l'erreur ci-dessous, nous insérons les catégories une à une. \n {}".format(e))
-
-    for category in categories:
-        try:
-            cursor.execute(add_category, category)
-        except mc.errors.IntegrityError as e:
-            print("Categorie {} déjà existante. \n {}".format(category[1], e))
-            continue
-        else:
-            print("Insertion de la catégorie {}: OK. ".format(category[1]))
-
-else:
-    print("\n Insertion en masse des catégories effectuée sans erreurs !")
+data = []
+for category in categories:
+    data.append(category)
+    try:
+        cursor.execute(add_category, data)
+    except mc.errors.IntegrityError as e:
+        print("\n Categorie {} déjà existante. \n {}".format(category, e))
+        continue
+    else:
+        print(" \n Insertion de la catégorie {}: OK. ".format(category))
+    finally:
+        data.pop()
 
 cnx.commit()
 cursor.close()
@@ -135,31 +131,20 @@ add_products = ("INSERT INTO products "
                 "%(ingredients_text_fr)s, %(allergens)s, %(stores)s, %(purchase_places)s)")
 
 cursor = cnx.cursor()
-try:
-    print("\n Essai d'insertion en masse des produits... \n")
-    cursor.executemany(add_products, data_set)
-
-except mc.errors.IntegrityError as e:
-    print("\n Suite à l'erreur ci-dessous, nous insérons les produits un à un. \n {}".format(e))
-
-    for product in data_set:
-        try:
-            cursor.execute(add_products, product)
-        except mc.Error as e:
-            print(" \n {} n'a pas été ajouté à la table des produits suite à cette erreur: \n {}.".format(product['product_name'], e))
-            continue
-        else:
-            print("\n {} a été ajouté à la table des produits.".format(product['product_name']))
-
-else:
-    print(" \n Insertion en masse effectuée sans erreurs !")
-
+for product in data_set:
+    try:
+        cursor.execute(add_products, product)
+    except mc.Error as e:
+        print(" \n {} n'a pas été ajouté à la table des produits suite à cette erreur: \n {}.".format(product['product_name'], e))
+        continue
+    else:
+        print("\n {} a été ajouté à la table des produits.".format(product['product_name']))
 
 cnx.commit()
 cursor.close()
 
 
-# search for a complete categorie type
+# search for a complete category type
 search_criterion = list()
 search_criterion.append(id_number)
 search_category = ("SELECT id, product_name FROM products "
@@ -169,17 +154,16 @@ search_category = ("SELECT id, product_name FROM products "
 cursor_category = cnx.cursor(dictionary=True, buffered=True)
 cursor_category.execute(search_category, search_criterion)  # /!\ faire en sorte qu'il y est une liste en param !!!!
 
-# results = cursor_category.fetchall()
 print("Voici les résultats de la requête de recherche pour cette categorie: \n ")
 for row in cursor_category:
     print("* {product_name} --> choix: {id} \n".format(**row))
 
 cursor_category.close()
 
-# search for a specific product
+# search details of a specific product
 
 search_product = ("SELECT product_name, nutrition_grade_fr, ingredients_text, allergens, stores, "
-                  "purchase_places, url, image_url, id "
+                  "purchase_places, url, image_url, id, category_id "
                   "FROM products WHERE id = %s")
 
 product_id = [96]
@@ -196,3 +180,11 @@ for row in cursor_product:
           "Plus d'infos: {url}".format(**row))
 
 cursor_product.close()
+
+# search for better graded product as a substitute
+# TODO: comment insérer la catégorie de produit et le nutriscore ?
+# TODO: comment sauvegarder le produit à substituer ?
+search_substitute = ("SELECT product_name, nutrition_grade_fr, id "
+                     "FROM products "
+                     "WHERE  category_id = %s AND nutrition_grade_fr < %s "
+                     "ORDER BY nutrition_grade_fr, product_name")
