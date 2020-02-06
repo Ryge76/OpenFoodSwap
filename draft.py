@@ -73,27 +73,39 @@ print("La liste finale comporte {} produits. \n {}".format(len(cleaned_final), c
 
 data_set = cleaned_final.copy()
 
+
 # initiating the OFS DB
 cnx = mc.connect(**config.db_access_testing)
-cursor = cnx.cursor()
+
 
 # populate categories table
-categories = ['fruits', 'legumes', 'produits laitiers', 'viandes', 'poissons', 'boissons', 'cereales', 'petit dej',
-              'snacks']
+categories = [(None, 'fruits'), (None, 'legumes'), (None, 'produits laitiers'), (None, 'viandes'),
+              (None, 'poissons'), (None, 'boissons'), (None, 'cereales'), (None, 'petit dej'),
+              (None, 'snacks')]
 
 add_category = ("INSERT INTO categories "
                 "VALUES (%s, %s)")
 
-# delete_categories = ("DELETE FROM categories")
-# cursor.execute(delete_categories)
+cursor = cnx.cursor()
+try:
+    print("\n Essai d'insertion en masse des categories... \n")
+    cursor.executemany(add_category, categories)
 
-for category in categories:
-    try:
-        cursor.execute(add_category, (None, category))
-    except mc.errors.IntegrityError as e:
-        print(e)
-        continue
 
+except mc.errors.IntegrityError as e:
+    print("\n Suite à l'erreur ci-dessous, nous insérons les catégories une à une. \n {}".format(e))
+
+    for category in categories:
+        try:
+            cursor.execute(add_category, category)
+        except mc.errors.IntegrityError as e:
+            print("Categorie {} déjà existante. \n {}".format(category[1], e))
+            continue
+        else:
+            print("Insertion de la catégorie {}: OK. ".format(category[1]))
+
+else:
+    print("\n Insertion en masse des catégories effectuée sans erreurs !")
 
 cnx.commit()
 cursor.close()
@@ -114,7 +126,6 @@ cursor_id.close()
 for product in data_set:
     product.update({'category_id': id_number})
 
-# print(data_set)
 
 # populate products table
 add_products = ("INSERT INTO products "
@@ -124,26 +135,31 @@ add_products = ("INSERT INTO products "
                 "%(ingredients_text_fr)s, %(allergens)s, %(stores)s, %(purchase_places)s)")
 
 cursor = cnx.cursor()
-for product in data_set:
-    try:
-        cursor.execute(add_products, product)
-    except mc.Error as e:
-        print("{} n'a pas été ajouté à la table des produits suite à cette erreur: \n {}.".format(product['product_name'], e))
-        continue
-    else:
-        print("{} a été ajouté à la table des produits.".format(product['product_name']))
+try:
+    print("\n Essai d'insertion en masse des produits... \n")
+    cursor.executemany(add_products, data_set)
 
-# # 2d method to populate products table
-# try:
-#     cursor.executemany(add_products, data_set)
-# except mysql.connector.errors.IntegrityError as e:
-#     print(e)
-#     continue
+except mc.errors.IntegrityError as e:
+    print("\n Suite à l'erreur ci-dessous, nous insérons les produits un à un. \n {}".format(e))
+
+    for product in data_set:
+        try:
+            cursor.execute(add_products, product)
+        except mc.Error as e:
+            print(" \n {} n'a pas été ajouté à la table des produits suite à cette erreur: \n {}.".format(product['product_name'], e))
+            continue
+        else:
+            print("\n {} a été ajouté à la table des produits.".format(product['product_name']))
+
+else:
+    print(" \n Insertion en masse effectuée sans erreurs !")
+
 
 cnx.commit()
 cursor.close()
 
-# search query for a complete categorie type
+
+# search for a complete categorie type
 search_criterion = list()
 search_criterion.append(id_number)
 search_category = ("SELECT id, product_name FROM products "
@@ -156,25 +172,27 @@ cursor_category.execute(search_category, search_criterion)  # /!\ faire en sorte
 # results = cursor_category.fetchall()
 print("Voici les résultats de la requête de recherche pour cette categorie: \n ")
 for row in cursor_category:
-    print("* {product_name} - identifiant: {id} \n".format(**row))
+    print("* {product_name} --> choix: {id} \n".format(**row))
 
 cursor_category.close()
 
 # search for a specific product
 
 search_product = ("SELECT product_name, nutrition_grade_fr, ingredients_text, allergens, stores, "
-                  "purchase_places, url, image_url "
+                  "purchase_places, url, image_url, id "
                   "FROM products WHERE id = %s")
 
-product_id = [100]
+product_id = [96]
 cursor_product = cnx.cursor(dictionary=True, buffered=True)
 cursor_product.execute(search_product, product_id)
 
 print("Voici les détails pour ce produit en particulier: \n ")
-for row in cursor_category:
+for row in cursor_product:
     print("* {product_name} - identifiant: {id} \n"
           "Nutriscore: {nutrition_grade_fr} \n"
           "Composition: {ingredients_text} \n"
           "Allergènes: {allergens} \n"
-          "Lieux de vente: {purchase_places} \n"
+          "Lieux de vente: {stores} \n"
           "Plus d'infos: {url}".format(**row))
+
+cursor_product.close()
