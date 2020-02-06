@@ -78,19 +78,25 @@ cnx = mc.connect(**config.db_access_testing)
 cursor = cnx.cursor()
 
 # populate categories table
-# categories = ['fruits', 'legumes', 'produits laitiers', 'viandes', 'poissons', 'boissons', 'cereales', 'petit dej',
-#               'snacks']
-#
-# add_category = ("INSERT INTO categories "
-#                 "VALUES (%s, %s)")
-#
-# # delete_categories = ("DELETE FROM categories")
-# # cursor.execute(delete_categories)
-#
-# # for category in categories:
-# #     cursor.execute(add_category, (None, category))
-# #
-# # cnx.commit()
+categories = ['fruits', 'legumes', 'produits laitiers', 'viandes', 'poissons', 'boissons', 'cereales', 'petit dej',
+              'snacks']
+
+add_category = ("INSERT INTO categories "
+                "VALUES (%s, %s)")
+
+# delete_categories = ("DELETE FROM categories")
+# cursor.execute(delete_categories)
+
+for category in categories:
+    try:
+        cursor.execute(add_category, (None, category))
+    except mc.errors.IntegrityError as e:
+        print(e)
+        continue
+
+
+cnx.commit()
+cursor.close()
 
 
 # find id for requested category
@@ -103,7 +109,7 @@ cursor_id = cnx.cursor(buffered=True)
 cursor_id.execute(find_category_id, categ_search)
 id_number = list(cursor_id.fetchone()).pop()  # get only the integer value of cursor_id
 print("\n Pour la catégorie {}, l'id est {}.".format(categ_search, id_number))
-
+cursor_id.close()
 # ad category_id to every products in the dataset
 for product in data_set:
     product.update({'category_id': id_number})
@@ -117,16 +123,58 @@ add_products = ("INSERT INTO products "
                 "VALUES (%(category_id)s, %(product_name)s, %(url)s, %(image_url)s, %(nutrition_grade_fr)s, "
                 "%(ingredients_text_fr)s, %(allergens)s, %(stores)s, %(purchase_places)s)")
 
-
+cursor = cnx.cursor()
 for product in data_set:
-    # cursor.execute(add_products, product)
     try:
         cursor.execute(add_products, product)
+    except mc.Error as e:
+        print("{} n'a pas été ajouté à la table des produits suite à cette erreur: \n {}.".format(product['product_name'], e))
+        continue
+    else:
         print("{} a été ajouté à la table des produits.".format(product['product_name']))
-    except mysql.connector.Error as e:
-        print("{} n'a pas été ajouté à la table des produits suite à cette erreur: \n {}.".format(product['product_name']), e)
+
+# # 2d method to populate products table
+# try:
+#     cursor.executemany(add_products, data_set)
+# except mysql.connector.errors.IntegrityError as e:
+#     print(e)
+#     continue
 
 cnx.commit()
+cursor.close()
 
+# search query for a complete categorie type
+search_criterion = list()
+search_criterion.append(id_number)
+search_category = ("SELECT id, product_name FROM products "
+                   "WHERE category_id = %s "
+                   "ORDER BY product_name")
 
+cursor_category = cnx.cursor(dictionary=True, buffered=True)
+cursor_category.execute(search_category, search_criterion)  # /!\ faire en sorte qu'il y est une liste en param !!!!
 
+# results = cursor_category.fetchall()
+print("Voici les résultats de la requête de recherche pour cette categorie: \n ")
+for row in cursor_category:
+    print("* {product_name} - identifiant: {id} \n".format(**row))
+
+cursor_category.close()
+
+# search for a specific product
+
+search_product = ("SELECT product_name, nutrition_grade_fr, ingredients_text, allergens, stores, "
+                  "purchase_places, url, image_url "
+                  "FROM products WHERE id = %s")
+
+product_id = [100]
+cursor_product = cnx.cursor(dictionary=True, buffered=True)
+cursor_product.execute(search_product, product_id)
+
+print("Voici les détails pour ce produit en particulier: \n ")
+for row in cursor_category:
+    print("* {product_name} - identifiant: {id} \n"
+          "Nutriscore: {nutrition_grade_fr} \n"
+          "Composition: {ingredients_text} \n"
+          "Allergènes: {allergens} \n"
+          "Lieux de vente: {purchase_places} \n"
+          "Plus d'infos: {url}".format(**row))
