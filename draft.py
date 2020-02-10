@@ -118,6 +118,7 @@ cursor_id.execute(find_category_id, categ_search)
 id_number = list(cursor_id.fetchone()).pop()  # get only the integer value of cursor_id
 print("\n Pour la catégorie {}, l'id est {}.".format(categ_search, id_number))
 cursor_id.close()
+
 # ad category_id to every products in the dataset
 for product in data_set:
     product.update({'category_id': id_number})
@@ -135,7 +136,7 @@ for product in data_set:
     try:
         cursor.execute(add_products, product)
     except mc.Error as e:
-        print(" \n {} n'a pas été ajouté à la table des produits suite à cette erreur: \n {}.".format(product['product_name'], e))
+        print("\n {} n'a pas été ajouté à la table des produits suite à cette erreur: \n {}.".format(product['product_name'], e))
         continue
     else:
         print("\n {} a été ajouté à la table des produits.".format(product['product_name']))
@@ -161,12 +162,11 @@ for row in cursor_category:
 cursor_category.close()
 
 # search details of a specific product
-
 search_product = ("SELECT product_name, nutrition_grade_fr, ingredients_text, allergens, stores, "
                   "purchase_places, url, image_url, id, category_id "
                   "FROM products WHERE id = %s")
 
-product_id = [96]
+product_id = [39]
 cursor_product = cnx.cursor(dictionary=True, buffered=True)
 cursor_product.execute(search_product, product_id)
 
@@ -181,10 +181,40 @@ for row in cursor_product:
 
 cursor_product.close()
 
+
+# search for any product
+search_all_products = ("SELECT product_name, products.id, categ_name AS categorie "
+                       "FROM products INNER JOIN categories "
+                       "ON products.category_id = categories.id "
+                       "WHERE product_name LIKE %s "
+                       "ORDER BY product_name")
+name = ['Bis%']
+cursor_product = cnx.cursor(dictionary=True, buffered=True)
+cursor_product.execute(search_all_products, name)
+
+print("Voici les résultats de votre recherche: \n ")
+for row in cursor_product:
+    print("* {product_name} - identifiant: {id} - catégorie: {categorie}\n".format(**row))
+
+cursor_product.close()
+
 # search for better graded product as a substitute
 # TODO: comment insérer la catégorie de produit et le nutriscore ?
 # TODO: comment sauvegarder le produit à substituer ?
 search_substitute = ("SELECT product_name, nutrition_grade_fr, id "
                      "FROM products "
-                     "WHERE  category_id = %s AND nutrition_grade_fr < %s "
+                     "WHERE  category_id = %(categ)s AND nutrition_grade_fr < %(score)s "
                      "ORDER BY nutrition_grade_fr, product_name")
+
+replace_me = {'categ': 9, 'score': 'd'}
+
+cursor_product = cnx.cursor(dictionary=True, buffered=True)
+cursor_product.execute(search_substitute, replace_me)
+
+print("Les subtituts possibles sont: \n ")
+for row in cursor_product:
+    print("* {product_name} - nutriscore: {nutrition_grade_fr} - identifiant: {id}\n".format(**row))
+
+cursor_product.close()
+
+
