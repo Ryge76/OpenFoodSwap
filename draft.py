@@ -217,4 +217,6 @@ for row in cursor_product:
 
 cursor_product.close()
 
+# add substitute
+
 

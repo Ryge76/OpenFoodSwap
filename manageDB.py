@@ -108,10 +108,24 @@ class Request(UseDB):
     def add_substitute(self):
         pass
 
-    def find_items(self):
+    def find_item_description(self, product_id):
         """Allow search for data in specific table"""
+        search_product = ("SELECT product_name, nutrition_grade_fr, ingredients_text, allergens, stores, "
+                          "purchase_places, url, image_url, id, category_id "
+                          "FROM products WHERE id = %s")
 
-        pass
+        self.cursor_type.update(dictionary=True, buffered=True)
+
+        results = Request.execute_search(search_product, product_id, **self.cursor_type)
+
+        print("Voici les détails pour ce produit en particulier: \n ")
+        for row in results:
+            print("* {product_name} - identifiant: {id} \n"
+                  "Nutriscore: {nutrition_grade_fr} \n"
+                  "Composition: {ingredients_text} \n"
+                  "Allergènes: {allergens} \n"
+                  "Lieux de vente: {stores} \n"
+                  "Plus d'infos: {url}".format(**row))
 
     def find_category_id(self, category):
         """Get the id associated with a specific category in the Categories table.
@@ -121,7 +135,7 @@ class Request(UseDB):
         find_category_id = ("SELECT id FROM categories "
                             "WHERE categ_name = %s")
 
-        self.cursor_type['buffered'] = True
+        self.cursor_type.update(dictionary=False, buffered=True)
 
         results = Request.execute_search(find_category_id, categ_name, **self.cursor_type)  # cursor object
 
@@ -131,4 +145,42 @@ class Request(UseDB):
 
         Request.close_all(results)
         return id_number
+
+    def search_any_product(self, name):
+        search_all_products = ("SELECT product_name, products.id, categ_name AS categorie "
+                               "FROM products INNER JOIN categories "
+                               "ON products.category_id = categories.id "
+                               "WHERE product_name LIKE %s "
+                               "ORDER BY product_name")
+
+        look_for = [name]
+        self.cursor_type.update(dictionary=True, buffered=True)
+
+        results = Request.execute_search(search_all_products, look_for, **self.cursor_type)
+
+        print("Voici les résultats de votre recherche: \n ")
+        for row in results:
+            print("* {product_name} - identifiant: {id} - catégorie: {categorie}\n".format(**row))
+
+        Request.close_all(results)
+
+    def search_substitute(self, product_id,product_categ):
+        search_substitute = ("SELECT product_name, nutrition_grade_fr, id "
+                             "FROM products "
+                             "WHERE  category_id = %(categ)s AND nutrition_grade_fr < %(score)s "
+                             "ORDER BY nutrition_grade_fr, product_name")
+
+        replace_me = {'categ': product_categ, 'score': product_id}
+        self.cursor_type.update(dictionary=True, buffered=True)
+
+        results = Request.execute_search(search_substitute, replace_me, **self.cursor_type)
+
+        print("Les subtituts possibles sont: \n ")
+        for row in results:
+            print("* {product_name} - nutriscore: {nutrition_grade_fr} - identifiant: {id}\n".format(**row))
+
+        Request.close_all(results)
+
+
+
 
