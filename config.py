@@ -9,13 +9,13 @@ def select_user():
     return answer
 
 
-db_access = {
-    'host': 'localhost',
-    'port': '3306',
-    'database': 'ofsdb',
-    'user': select_user(),
-    'password': input("Saisissez le mot de passe pour cet utilisateur:  ")
-}
+# db_access = {
+#     'host': 'localhost',
+#     'port': '3306',
+#     'database': 'ofsdb',
+#     'user': select_user(),
+#     'password': input("Saisissez le mot de passe pour cet utilisateur:  ")
+# }
 
 # for testing access to the database
 db_access_testing = {
@@ -25,3 +25,4 @@ db_access_testing = {
     'user': 'appadm',
     'password': 'testrole'
 }
+
