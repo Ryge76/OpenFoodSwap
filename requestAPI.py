@@ -27,7 +27,7 @@ class FoodAPI:
         print("Requête correctement effectuée vers: \n {} \n".format(r.url))
 
         self.json = r.json()
-        FoodAPI.add_category(self)
+        self.add_category()
 
     def add_category(self):
         self.json.update({'categ_name': self.category})

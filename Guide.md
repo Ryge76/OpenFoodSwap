@@ -41,3 +41,8 @@ le programme. Par ailleurs quelque difficulté d'installation dans l'environneme
 
 - Définir l'ordre d'intégration des données. D'abord les catégories de produits. Ensuite les produits auxquels
 il faut intégrer la catégorie à laquelle ils correspondent.
+
+- Comprendre les méthodes implémentées dans le module sql-cconnector et notamment le type d'argument qu'elles nécessitent
+pour fonctionner correctement. Exp: la fonction cursor.execute(statement, data) requière que les data soient sous forme 
+de liste ou dictionnaire pour les requêtes d'insertion.
+

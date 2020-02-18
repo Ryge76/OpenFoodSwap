@@ -102,17 +102,24 @@ class Command:
 
     @staticmethod
     def add_categories(db, data):
+        """Add a new category in 'categories' table.
+        Require data to be a list type"""
         add_category = ("INSERT INTO categories "
                         "(categ_name) "
                         "VALUES (%s)")
 
-        for item in data:
-            if isinstance(item, (dict, list)):
-                db.execute_insertion(add_category, item)
+        if isinstance(data, str):
+            value = [data]
+            db.execute_insertion(add_category, value)
 
-            else:
-                value = [item]
-                db.execute_insertion(add_category, value)
+        else:
+            for item in data:
+                if isinstance(item, (dict, list)):
+                    db.execute_insertion(add_category, item)
+
+                else:
+                    value = [item]
+                    db.execute_insertion(add_category, value)
 
     @staticmethod
     def add_substitute(db, data):
@@ -145,7 +152,8 @@ class Command:
 
     def find_category_id(self, db, category):
         """Get the id associated with a specific category in the Categories table.
-        Require a category name. Return an id integer"""
+        Require a category name (string).
+        Return an id integer"""
 
         categ_name = [category]
         find_category_id = ("SELECT id FROM categories "
@@ -154,6 +162,10 @@ class Command:
         self.cursor_type.update(dictionary=False, buffered=True)
 
         results = db.execute_search(find_category_id, categ_name, **self.cursor_type)  # cursor object
+
+        if results is None:
+            print("La categorie {} n'existe pas".format(category))
+            return None
 
         id_number = results.fetchone()[0]  # get only the integer value of cursor_id tuple
         print("\n Pour la catégorie {}, l'id est {}.".format(categ_name, id_number))

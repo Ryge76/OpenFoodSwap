@@ -22,27 +22,20 @@ class Parser:
                 print("La valeur de la clé '{}' est manquante sur le produit '{}'".format(key, dic['product_name']))
                 return True
 
-    @staticmethod
-    def find_invalid_value(p_list):
+    def find_invalid_value(self, p_list):
         """Find product with no values for mandatory keys.
         Require a list of product in argument.
         Return list of indexes of products with incorrect values."""
         to_delete = []  # list of indexes of incorrect products
 
         for product in p_list:
-            control = Parser.check_value(product)
+            control = self.check_value(product)
             if control:
                 index = p_list.index(product)
                 to_delete.append(index)
 
         print("Index des produits à supprimer: \n {} \n".format(to_delete))
         return to_delete
-
-    def add_category(self):
-        """Add category tag to each valid product to identify their category."""
-        for product in self.products_list:
-            product.update({'categ_name': self.category})
-        return self.products_list
 
     def find_incorrect_product(self, p_list):
         """Look for products in a list of products that haven't got the correct number of criteria.
@@ -73,12 +66,10 @@ class Parser:
         """Implements the parsing logic with successive calls to internal methods"""
         print("Le jeu initial de données contient {} produits. \n".format(len(self.products_list)))
 
-        incorrect_idx = Parser.find_incorrect_product(self, self.products_list)  # step 1: identifying index of incomplete products
-        complete_products_only = Parser.delete_incorrect(self, incorrect_idx)  # step 2: remove unwanted products
-        incorrect_idx = Parser.find_invalid_value(complete_products_only)  # step 3: identifying index of products with invalid values
-        Parser.delete_incorrect(self, incorrect_idx)  # step 4 removing product with invalid value for keys
-
-        self.final_result = Parser.add_category(self)  # adding category tag to each product
+        incorrect_idx = self.find_incorrect_product(self.products_list)  # step 1: identifying index of incomplete products
+        complete_products_only = self.delete_incorrect(incorrect_idx)  # step 2: remove unwanted products
+        incorrect_idx = self.find_invalid_value(complete_products_only)  # step 3: identifying index of products with invalid values
+        self.final_result = self.delete_incorrect(incorrect_idx)  # step 4 removing product with invalid value for keys
 
         print("Le jeu final de données contient {} produits. \n".format(len(self.final_result)))
 
