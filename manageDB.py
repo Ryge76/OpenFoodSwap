@@ -1,32 +1,13 @@
 import mysql.connector as mc
 import config
 
-"""
-Etpaes:
-1. initialiser la connection avec la DB
-2. Remplir la BD
-3. Faire des requêtes select pour chercher un produit
-3. Faire des requêtes select pour trouver un équivalent
-4. Enregistrer le substitut dans la BD
-
-5. 
-"""
-
 
 class UseDB:
     """Manage access to the OFS database.
     Provide functions to add data in the db and query those data"""
     def __init__(self):
         self.cnx = mc.connect(**config.db_access_testing)
-        print("\n Connexion initialisée.")
-
-    def cancel_insertion(self):
-        self.cnx.rollback()
-        return print("Requête annulée.")
-
-    def validate_insertion(self):
-        self.cnx.commit()
-        return print("Requête appliquée (commit).")
+        # print("\n Connexion initialisée.")
 
     def end_connexion(self):
         self.cnx.close()
@@ -36,12 +17,12 @@ class UseDB:
     def close_cursor(cursor):
         """Close cursor."""
         cursor.close()
-        return print("Curseur fermé.")
+        # return print("Curseur fermé.")
 
     def create_cursor(self, **cursor_type):
         """Create a cursor and pass the request to the db."""
         cursor = self.cnx.cursor(**cursor_type)  # TODO: TE
-        print("\n Curseur créé.")
+        # print("\n Curseur créé.")
         return cursor
 
     def close_all(self, cursor=None):
@@ -75,8 +56,9 @@ class UseDB:
         except mc.Error as e:
             print("\n Suite à cette erreur: {}, \n l'item suivant n'a pas été ajouté à la table voulu. "
                   "\n {}".format(e, data))
+
         else:
-            print("\n {}, a été ajouté à la table voulu.".format(data))
+            # print("\n {}, a été ajouté à la table voulu.".format(data))
             self.cnx.commit()
 
         self.close_cursor(cursor)
@@ -139,16 +121,20 @@ class Command:
 
         self.cursor_type.update(dictionary=True, buffered=True)
 
+        product_id = [product_id]
+
         results = db.execute_search(search_product, product_id, **self.cursor_type)
 
-        print("Voici les détails pour ce produit en particulier: \n ")
-        for row in results:
-            print("* {product_name} - identifiant: {id} \n"
-                  "Nutriscore: {nutrition_grade_fr} \n"
-                  "Composition: {ingredients_text} \n"
-                  "Allergènes: {allergens} \n"
-                  "Lieux de vente: {stores} \n"
-                  "Plus d'infos: {url}".format(**row))
+        # print("Voici les détails pour ce produit en particulier: \n ")
+        # for row in results:
+        #     print("* {product_name} - identifiant: {id} \n"
+        #           "Nutriscore: {nutrition_grade_fr} \n"
+        #           "Composition: {ingredients_text} \n"
+        #           "Allergènes: {allergens} \n"
+        #           "Lieux de vente: {stores} \n"
+        #           "Plus d'infos: {url}".format(**row))
+
+        return results
 
     def find_category_id(self, db, category):
         """Get the id associated with a specific category in the Categories table.
@@ -175,7 +161,7 @@ class Command:
         return id_number
 
     def search_any_product(self, db, name):
-        search_all_products = ("SELECT product_name, products.id, categ_name AS categorie "
+        search_all_products = ("SELECT product_name, products.id, nutrition_grade_fr, categ_name AS categorie "
                                "FROM products INNER JOIN categories "
                                "ON products.category_id = categories.id "
                                "WHERE product_name LIKE %s "
@@ -186,34 +172,40 @@ class Command:
 
         results = db.execute_search(search_all_products, look_for, **self.cursor_type)
 
-        if results is None:
-            print("\n Echec de la commande de recherche.")
-            return
+        # if results is None:
+        #     print("\n Echec de la commande de recherche.")
+        #     return
+        #
+        # if results.rowcount == 0:
+        #     print("Aucun résultat pour {}".format(look_for))
+        #
+        # else:
+        #     print("Voici les résultats de votre recherche sur '{}': \n ".format(name))
+        #     for row in results:
+        #         print("* {product_name} - identifiant: {id} - catégorie: {categorie}\n".format(**row))
 
-        if results.rowcount == 0:
-            print("Aucun résultat pour {}".format(look_for))
+        return results
 
-        else:
-            print("Voici les résultats de votre recherche sur '{}': \n ".format(name))
-            for row in results:
-                print("* {product_name} - identifiant: {id} - catégorie: {categorie}\n".format(**row))
-
-    def search_substitute(self, db, product_id, product_categ):
-        search_substitute = ("SELECT product_name, nutrition_grade_fr, id "
+    def search_substitute(self, db, product_score, category_id):
+        search_substitute = ("SELECT product_name, categories.categ_name, nutrition_grade_fr, products.id "
                              "FROM products "
+                             "INNER JOIN categories "
+                             "ON products.category_id = categories.id "
                              "WHERE  category_id = %(categ)s AND nutrition_grade_fr < %(score)s "
                              "ORDER BY nutrition_grade_fr, product_name")
 
-        replace_me = {'categ': product_categ, 'score': product_id}
+        replace_me = {'score': product_score, 'categ': category_id}
         self.cursor_type.update(dictionary=True, buffered=True)
 
         results = db.execute_search(search_substitute, replace_me, **self.cursor_type)
 
-        print("Les subtituts possibles sont: \n ")
-        for row in results:
-            print("* {product_name} - nutriscore: {nutrition_grade_fr} - identifiant: {id}\n".format(**row))
+        # print("Les subtituts possibles sont: \n ")
+        # for row in results:
+        #     print("* {product_name} - nutriscore: {nutrition_grade_fr} - identifiant: {id}\n".format(**row))
+        #
+        # db.close_cursor(results)
 
-        db.close_cursor(results)
+        return results
 
 
 def main():
