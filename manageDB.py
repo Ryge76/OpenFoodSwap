@@ -30,14 +30,14 @@ class UseDB:
             cursor.close()
         self.cnx.close()
 
-    def execute_search(self, statement, data, **cursor_type):
+    def execute_search(self, statement, *data, **cursor_type):
         """Handle request command by creating the cursor and executing it.
         Require a tuple with the statement to perform, a list of data to process, an iterable cursor_type of parameters
         to create the cursor upon."""
 
         cursor = self.create_cursor(**cursor_type)
         try:
-            cursor.execute(statement, data)
+            cursor.execute(statement, *data)
         except mc.Error as e:
             print(" \n Votre recherche n'a pu aboutir suite à cette erreur: \n{}".format(e))
             return
@@ -206,6 +206,35 @@ class Command:
         # db.close_cursor(results)
 
         return results
+
+    def find_by_category(self, db, category):
+        find_category = ("SELECT product_name, products.id, nutrition_grade_fr, categ_name AS categorie "
+                         "FROM products INNER JOIN categories "
+                         "ON products.category_id = categories.id "
+                         "WHERE categ_name = %s "
+                         "ORDER BY product_name")
+
+        look_for = [category]
+
+        self.cursor_type.update(dictionary=True, buffered=True)
+        results = db.execute_search(find_category, look_for, **self.cursor_type)
+
+        return results
+
+    def show_all_substitutes(self, db):
+        """Show all substitutions from substitutes table"""
+        show_substitutes = ("SELECT products.product_name as 'source', products.nutrition_grade_fr, products.id, "
+                            "p.product_name as 'substitut', p.nutrition_grade_fr as 'nutriscore', p.id as 'id_sub', "
+                            "subs_date "
+                            "FROM substitutes INNER JOIN products ON initial_product = products.id "
+                            "INNER JOIN products AS p ON substitute = p.id "
+                            "ORDER BY subs_date")
+
+        self.cursor_type.update(dictionary=True, buffered=True)
+        results = db.execute_search(show_substitutes, **self.cursor_type)
+
+        return results
+
 
 
 def main():

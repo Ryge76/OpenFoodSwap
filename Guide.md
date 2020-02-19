@@ -46,3 +46,8 @@ il faut intégrer la catégorie à laquelle ils correspondent.
 pour fonctionner correctement. Exp: la fonction cursor.execute(statement, data) requière que les data soient sous forme 
 de liste ou dictionnaire pour les requêtes d'insertion.
 
+- Comprendre certaines subtilités sur la formulation des requêtes pour le module mysql-connect
+notemment sur le fait que les alias de table dans les requêtes ne passent que partiellement. Les colonnes renommées 
+à partir de ces alias ne seront pas trouvées ! Et cela sans message d'erreur. Exp: table products as p, et p.id. L"alias
+sera bien pris en compte pour la table mais pas pour la colonne.
+
