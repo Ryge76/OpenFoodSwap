@@ -15,7 +15,8 @@ class LineInterface:
         }
         self.search_options = {
             '1': self.get_info,
-            '2': self.back_to_menu
+            '2': self.find_substitute,
+            '3': self.back_to_menu
         }
 
         self.substitute_options = {
@@ -25,7 +26,8 @@ class LineInterface:
 
         self.record_options = {
             '1': self.record_substitute,
-            '2': self.back_to_menu
+            '2': self.get_info,
+            '3': self.back_to_menu
         }
 
         self.categ_options = {}
@@ -61,7 +63,7 @@ class LineInterface:
         Voici les actions possibles
 
         1- Rechercher des informations sur un aliment en particulier
-        2- Explorer une catégorie d'aliment
+        2- Explorer une catégorie d'aliments
         3- Consulter l'historique de vos substitutions
         4- Quitter l'application """)
 
@@ -70,7 +72,8 @@ class LineInterface:
         print("""
         Vous pouvez:
             1- obtenir plus d'infos sur un produit en particulier
-            2- revenir au menu principal 
+            2- chercher un substitut
+            3- revenir au menu principal 
         """)
 
     @staticmethod
@@ -86,7 +89,8 @@ class LineInterface:
         print("""
         Vous pouvez:
             1- enregistrer un subtitut pour le retrouver plus tard (menu principal -> historique)
-            2- revenir au menu principal 
+            2- obtenir plus d'infos sur un produit
+            3- revenir au menu principal 
         """)
 
     def display_categ_submenu(self):
