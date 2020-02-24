@@ -1,0 +1,40 @@
+#Welcome to Open Food SWAP !
+
+To use this application, please first download and install 
+*[MySql Community Edition](https://www.mysql.com/products/community/)*
+
+Once MySQL is installed, run `ofsdb_simple_creation.sql` script.
+This script create the required schema for this application.
+
+Finally, run `ofs.py -i` 
+
+(-i is optional and *only* necessary for the first launch, which populate the 
+ database with datas from Open Foods Facts.)
+
+
+Enjoy !
+
+
+-----------------------------------------------------------------------
+
+
+
+
+#Bienvenue dans **Open Food SWAP** !
+
+Pour utiliser cette application, vous devez télécharger et installer 
+*[MySql Community Edition](https://www.mysql.com/products/community/)*
+
+Une fois MySQL installé, lancez le script `ofsdb_simple_creation.sql` présent
+ dans ce répertoire.
+ 
+Celui-ci crééra le modèle de base de donnée nécessaire au fonctionnement de
+l'application.
+
+Enfin lancez l'application `ofs.py -i` 
+
+(l'option -i est nécessaire *uniquement* pour 
+le premier lancement afin d'installer un premier jeu de données dans la base de
+données.)
+
+Enjoy !
