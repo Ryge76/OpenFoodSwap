@@ -58,12 +58,15 @@ class Ofs(t.Tk):
         Bienvenue dans OpenFood SWAP !""", fg='blue')
         welcome.pack(side='top', fill=t.BOTH)
 
-        sub_welcome = t.Label(welcome_frame, text="""Cette application vous permet d'avoir des infos sur ce que vous consommez,
-        et de trouver éventuellement des équivalents plus sains ! ;-)
+        sub_welcome = t.Label(welcome_frame, text="""
+        Cette application vous permet d'avoir des infos sur ce que vous 
+        consommez, et de trouver éventuellement 
+        des équivalents plus sains ! ;-)
         """)
         sub_welcome.pack()
 
-        start_button = t.Button(welcome_frame, text="Cliquez pour commencer !", fg='green', command=self.show_next)
+        start_button = t.Button(welcome_frame, text="Cliquez pour commencer !",
+                                fg='green', command=self.show_next)
         start_button.pack(side="bottom", fill=t.BOTH)
 
     def main_menu_screen(self):
@@ -76,23 +79,32 @@ class Ofs(t.Tk):
 
         # create menu option with radio button.
         choice = t.IntVar()
-        choice_menu_1 = t.Radiobutton(option_menu, text="Rechercher des informations sur un aliment en particulier",
-                                      variable=choice, value=1)
+        choice_menu_1 = t.Radiobutton(
+            option_menu,
+            text="Rechercher des informations sur un aliment en particulier",
+            variable=choice, value=1)
         choice_menu_1.pack(fill=t.BOTH)
 
-        choice_menu_2 = t.Radiobutton(option_menu, text="Explorer une catégorie d'aliments",
+        choice_menu_2 = t.Radiobutton(option_menu,
+                                      text="Explorer une catégorie d'aliments",
                                       variable=choice, value=2)
         choice_menu_2.pack(fill=t.BOTH)
 
-        choice_menu_3 = t.Radiobutton(option_menu, text="Consulter l'historique de vos substitutions",
-                                      variable=choice, value=3)
+        choice_menu_3 = t.Radiobutton(
+            option_menu, text="Consulter l'historique de vos substitutions",
+            variable=choice, value=3)
         choice_menu_3.pack(fill=t.BOTH)
 
-        choice_menu_4 = t.Radiobutton(option_menu, text="Quitter l'application",
-                                      variable=choice, value=4)
+        choice_menu_4 = t.Radiobutton(
+            option_menu, text="Quitter l'application",
+            variable=choice, value=4)
         choice_menu_4.pack(fill=t.BOTH)
 
 
+def main():
+    app = Ofs()
+    app.run()
+
+
 if __name__ == '__main__':
-    w = Ofs()
-    w.run()
+    main()

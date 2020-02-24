@@ -337,8 +337,15 @@ class LineInterface:
             self.choice(self.main_options)
 
 
-if __name__ == '__main__':
+def main():
     LineInterface().welcome()
+
+
+if __name__ == '__main__':
+    main()
+
+
+
 
 
 

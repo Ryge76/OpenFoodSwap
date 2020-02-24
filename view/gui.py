@@ -1,6 +1,6 @@
 import tkinter as t
 import time
-import manageDB
+import OpenFoodsSwap.manageDB
 
 
 class ViewControl(t.Frame):

@@ -32,21 +32,24 @@ class UseDB:
 
     def execute_search(self, statement, *data, **cursor_type):
         """Handle request command by creating the cursor and executing it.
-        Require a tuple with the statement to perform, a list of data to process, an iterable cursor_type of parameters
+        Require a tuple with the statement to perform, a list of data to
+         process, an iterable cursor_type of parameters
         to create the cursor upon."""
 
         cursor = self.create_cursor(**cursor_type)
         try:
             cursor.execute(statement, *data)
         except mc.Error as e:
-            print(" \n Votre recherche n'a pu aboutir suite à cette erreur: \n{}".format(e))
+            print(" \n Votre recherche n'a pu aboutir suite à cette erreur: "
+                  "\n{}".format(e))
             return
         else:
             return cursor
 
     def execute_insertion(self, statement, data, **cursor_type):
         """Handle request command by creating the cursor and executing it.
-        Require tuple with the statement to perform, a list of data to process, iterable cursor_type of parameters
+        Require tuple with the statement to perform, a list of data to process,
+         iterable cursor_type of parameters
         to create the cursor upon."""
 
         cursor = self.create_cursor(**cursor_type)
@@ -54,7 +57,8 @@ class UseDB:
         try:
             cursor.execute(statement, data)
         except mc.Error as e:
-            print("\n Suite à cette erreur: {}, \n l'item suivant n'a pas été ajouté à la table voulu. "
+            print("\n Suite à cette erreur: {}, \n "
+                  "l'item suivant n'a pas été ajouté à la table voulu. "
                   "\n {}".format(e, data))
 
         else:
@@ -74,11 +78,14 @@ class Command:
     def add_products(db, data):
         """Allow inserting items in selected table.
         Need table, data formated for selected table"""
-        add_products = ("INSERT INTO products "
-                        "(category_id, product_name, url, image_url, nutrition_grade_fr, ingredients_text, allergens, "
-                        "stores, purchase_places) "
-                        "VALUES (%(category_id)s, %(product_name)s, %(url)s, %(image_url)s, %(nutrition_grade_fr)s, "
-                        "%(ingredients_text_fr)s, %(allergens)s, %(stores)s, %(purchase_places)s)")
+        add_products = (
+            "INSERT INTO products "
+            "(category_id, product_name, url, image_url, nutrition_grade_fr,"
+            " ingredients_text, allergens, stores, purchase_places) "
+            "VALUES (%(category_id)s, %(product_name)s, %(url)s,"
+            " %(image_url)s, %(nutrition_grade_fr)s, "
+            "%(ingredients_text_fr)s, %(allergens)s, %(stores)s,"
+            " %(purchase_places)s)")
 
         db.execute_insertion(add_products, data)
 
@@ -115,7 +122,8 @@ class Command:
 
     def find_item_description(self, db, product_id):
         """Allow search for data in specific table"""
-        search_product = ("SELECT product_name, nutrition_grade_fr, ingredients_text, allergens, stores, "
+        search_product = ("SELECT product_name, nutrition_grade_fr,"
+                          " ingredients_text, allergens, stores, "
                           "purchase_places, url, image_url, id, category_id "
                           "FROM products WHERE id = %s")
 
@@ -123,21 +131,14 @@ class Command:
 
         product_id = [product_id]
 
-        results = db.execute_search(search_product, product_id, **self.cursor_type)
-
-        # print("Voici les détails pour ce produit en particulier: \n ")
-        # for row in results:
-        #     print("* {product_name} - identifiant: {id} \n"
-        #           "Nutriscore: {nutrition_grade_fr} \n"
-        #           "Composition: {ingredients_text} \n"
-        #           "Allergènes: {allergens} \n"
-        #           "Lieux de vente: {stores} \n"
-        #           "Plus d'infos: {url}".format(**row))
+        results = db.execute_search(search_product, product_id,
+                                    **self.cursor_type)
 
         return results
 
     def find_category_id(self, db, category):
-        """Get the id associated with a specific category in the Categories table.
+        """Get the id associated with a specific category in the
+        Categories table.
         Require a category name (string).
         Return an id integer"""
 
@@ -147,68 +148,60 @@ class Command:
 
         self.cursor_type.update(dictionary=False, buffered=True)
 
-        results = db.execute_search(find_category_id, categ_name, **self.cursor_type)  # cursor object
+        results = db.execute_search(find_category_id, categ_name,
+                                    **self.cursor_type)
 
         if results is None:
             print("La categorie {} n'existe pas".format(category))
             return None
 
-        id_number = results.fetchone()[0]  # get only the integer value of cursor_id tuple
-        print("\n Pour la catégorie {}, l'id est {}.".format(categ_name, id_number))
+        # get only the integer value of cursor_id tuple
+        id_number = results.fetchone()[0]
+        print("\n Pour la catégorie {}, l'id est {}.".format(categ_name,
+                                                             id_number))
 
         db.close_cursor(results)
 
         return id_number
 
     def search_any_product(self, db, name):
-        search_all_products = ("SELECT product_name, products.id, nutrition_grade_fr, categ_name AS categorie "
-                               "FROM products INNER JOIN categories "
-                               "ON products.category_id = categories.id "
-                               "WHERE product_name LIKE %s "
-                               "ORDER BY product_name")
+        search_all_products = (
+            "SELECT product_name, products.id, nutrition_grade_fr,"
+            " categ_name AS categorie "
+            "FROM products INNER JOIN categories "
+            "ON products.category_id = categories.id "
+            "WHERE product_name LIKE %s "
+            "ORDER BY product_name")
 
         look_for = [name + '%']
         self.cursor_type.update(dictionary=True, buffered=True)
 
-        results = db.execute_search(search_all_products, look_for, **self.cursor_type)
-
-        # if results is None:
-        #     print("\n Echec de la commande de recherche.")
-        #     return
-        #
-        # if results.rowcount == 0:
-        #     print("Aucun résultat pour {}".format(look_for))
-        #
-        # else:
-        #     print("Voici les résultats de votre recherche sur '{}': \n ".format(name))
-        #     for row in results:
-        #         print("* {product_name} - identifiant: {id} - catégorie: {categorie}\n".format(**row))
+        results = db.execute_search(search_all_products, look_for,
+                                    **self.cursor_type)
 
         return results
 
     def search_substitute(self, db, product_score, category_id):
-        search_substitute = ("SELECT product_name, categories.categ_name, nutrition_grade_fr, products.id "
+        search_substitute = ("SELECT product_name, categories.categ_name,"
+                             " nutrition_grade_fr, products.id "
                              "FROM products "
                              "INNER JOIN categories "
                              "ON products.category_id = categories.id "
-                             "WHERE  category_id = %(categ)s AND nutrition_grade_fr < %(score)s "
+                             "WHERE category_id = %(categ)s AND "
+                             "nutrition_grade_fr < %(score)s "
                              "ORDER BY nutrition_grade_fr, product_name")
 
         replace_me = {'score': product_score, 'categ': category_id}
         self.cursor_type.update(dictionary=True, buffered=True)
 
-        results = db.execute_search(search_substitute, replace_me, **self.cursor_type)
-
-        # print("Les subtituts possibles sont: \n ")
-        # for row in results:
-        #     print("* {product_name} - nutriscore: {nutrition_grade_fr} - identifiant: {id}\n".format(**row))
-        #
-        # db.close_cursor(results)
+        results = db.execute_search(search_substitute, replace_me,
+                                    **self.cursor_type)
 
         return results
 
     def find_by_category(self, db, category):
-        find_category = ("SELECT product_name, products.id, nutrition_grade_fr, categ_name AS categorie "
+        find_category = ("SELECT product_name, products.id,"
+                         " nutrition_grade_fr, categ_name AS categorie "
                          "FROM products INNER JOIN categories "
                          "ON products.category_id = categories.id "
                          "WHERE categ_name = %s "
@@ -217,16 +210,20 @@ class Command:
         look_for = [category]
 
         self.cursor_type.update(dictionary=True, buffered=True)
-        results = db.execute_search(find_category, look_for, **self.cursor_type)
+        results = db.execute_search(find_category, look_for,
+                                    **self.cursor_type)
 
         return results
 
     def show_all_substitutes(self, db):
         """Show all substitutions from substitutes table"""
-        show_substitutes = ("SELECT products.product_name as 'source', products.nutrition_grade_fr, products.id, "
-                            "p.product_name as 'substitut', p.nutrition_grade_fr as 'nutriscore', p.id as 'id_sub', "
-                            "subs_date "
-                            "FROM substitutes INNER JOIN products ON initial_product = products.id "
+        show_substitutes = ("SELECT products.product_name as 'source',"
+                            " products.nutrition_grade_fr, products.id, "
+                            "p.product_name as 'substitut', "
+                            "p.nutrition_grade_fr as 'nutriscore', "
+                            "p.id as 'id_sub', subs_date "
+                            "FROM substitutes INNER JOIN products "
+                            "ON initial_product = products.id "
                             "INNER JOIN products AS p ON substitute = p.id "
                             "ORDER BY subs_date")
 
@@ -236,22 +233,23 @@ class Command:
         return results
 
 
-
-def main():
-    product = [{'allergens': 'en:gluten,en:milk,en:soybeans', 'product_name': 'Prince: Goût Chocolat au Blé Complet',
-                'stores': 'Carrefour Market,Magasins U,Auchan,Intermarché,Carrefour,Casino,Leclerc,Cora,Bi1',
-                'url': 'https://fr.openfoodfacts.org/produit/7622210449283/prince-gout-chocolat-au-ble-complet-lu',
-                'image_url': 'https://static.openfoodfacts.org/images/products/762/221/044/9283/front_fr.286.400.jpg',
-                'nutrition_grade_fr': 'd', 'purchase_places': 'F-77480 Mousseaux-les-Bray,FRANCE',
-                'ingredients_text_fr': "Céréale 50,7 % (farine de blé 35 %, farine de blé complète 15,7 %), sucre, "
-                                       "huiles végétales (palme, colza), cacao maigre en poudre 4,5 %, sirop de glucose, "
-                                       "amidon de blé, poudre à lever (carbonate acide d'ammonium, carbonate acide de sodium, "
-                                       "diphosphate disodique), émulsifiants (lécithine de soja, lécithine de tournesol), "
-                                       "sel, lait écrémé en poudre, lactose et protéines de lait, arômes."}]
+def sample():
+    product = [
+        {'allergens': 'en:gluten,en:milk,en:soybeans',
+         'product_name': 'Prince: Goût Chocolat au Blé Complet',
+         'stores': 'Carrefour Market,Magasins U,Auchan,Intermarché,Carrefour,'
+                   'Casino,Leclerc,Cora,Bi1',
+         'url': 'https://fr.openfoodfacts.org/',
+         'image_url': 'https://static.openfoodfacts.org/images/',
+         'nutrition_grade_fr': 'd',
+         'purchase_places': 'F-77480 Mousseaux-les-Bray,FRANCE',
+         'ingredients_text_fr': "Céréale , sucre, sel, lait écrémé en poudre,"
+                                " lactose et protéines de lait, arômes."}]
 
     categories = ['snacks', 'legumes']
 
-    db = UseDB()  # initiate connexion to the database
+    # initiate connexion to the database
+    db = UseDB()
     c = Command()
     c.add_categories(db, categories)
     categ = c.find_category_id(db, 'snacks')
@@ -268,5 +266,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    sample()
 
