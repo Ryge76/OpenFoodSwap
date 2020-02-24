@@ -33,8 +33,10 @@ class LineInterface:
         self.categ_options = {}
         self.source_product_id = ''
         self.categ_choice = ''
-        self.categories = ['fruits', 'legumes-et-derives', 'produits-laitiers', 'viandes', 'poissons',
-                           'boissons', 'aliments-et-boissons-a-base-de-vegetaux', 'petit-dejeuners', 'snacks']
+        self.categories = ['fruits', 'legumes-et-derives', 'produits-laitiers',
+                           'viandes', 'poissons', 'boissons',
+                           'aliments-et-boissons-a-base-de-vegetaux',
+                           'petit-dejeuners', 'snacks']
 
     @staticmethod
     def quit():
@@ -105,7 +107,8 @@ class LineInterface:
 
         # add a last choice
         print("""
-            {a}- {b}""".format(a=(len(self.categories)+1), b='revenir au menu principal'))
+            {a}- {b}""".format(a=(len(self.categories)+1),
+                               b='revenir au menu principal'))
 
     def choice(self, possibilities):
         """Get user to select an action in a specific range of options."""
@@ -113,7 +116,8 @@ class LineInterface:
         possible_keys = list(possibilities.keys())
         choice = ''
         while choice not in possibilities:
-            choice = input("\n Que voulez vous faire ? choix possibles {}:  ".format(possible_keys))
+            choice = input("\n Que voulez vous faire ? choix possibles "
+                           "{}:  ".format(possible_keys))
 
         if possibilities == self.categ_options:
             self.categ_choice = choice
@@ -139,7 +143,8 @@ class LineInterface:
 
     def search_product(self):
         """Handle search on any product."""
-        search = input("\n Tapez les premières lettres ou le nom complet de l'aliment que vous recherchez:  ")
+        search = input("\n Tapez les premières lettres ou le nom complet de "
+                       "l'aliment que vous recherchez:  ")
 
         results = self.action.search_any_product(self.db, search)
 
@@ -152,7 +157,8 @@ class LineInterface:
             return
 
         else:
-            print("\n Voici les résultats de votre recherche sur '{}': \n ".format(search))
+            print("\n Voici les résultats de votre recherche sur "
+                  "'{}': \n ".format(search))
             for row in results:
                 print("""
                 * {product_name}
@@ -168,7 +174,8 @@ class LineInterface:
 
         control = True
         while control:
-            search = input("\n Tapez l'identifiant de l'aliment pour lequel vous souhaitez plus d'information:  ")
+            search = input("\n Tapez l'identifiant de l'aliment pour lequel "
+                           "vous souhaitez plus d'information:  ")
 
             # check validity of input. Integer expected.
             control = self.check_type(search)
@@ -180,7 +187,8 @@ class LineInterface:
             self.get_info()
 
         elif results.rowcount == 0:
-            print("Mmmh, nous ne trouvons pas d'information sur le produit {}...".format(search))
+            print("Mmmh, nous ne trouvons pas d'information sur le produit "
+                  "{}...".format(search))
             return
 
         print("\n Voici les détails pour ce produit en particulier: \n ")
@@ -205,7 +213,8 @@ class LineInterface:
 
         control = True
         while control:
-            search = input("Tapez l'identifiant du produit pour lequel vous voulez un substitut: ")
+            search = input("Tapez l'identifiant du produit pour lequel vous"
+                           " voulez un substitut: ")
 
             # check validity of input. Integer expected.
             control = self.check_type(search)
@@ -216,11 +225,13 @@ class LineInterface:
         source_info = self.action.find_item_description(self.db, search)
 
         if source_info is None:
-            print("Le produit {} ne semble pas exister. Ressayez à nouveau".format(search))
+            print("Le produit {} ne semble pas exister. Ressayez à "
+                  "nouveau".format(search))
             self.find_substitute()
 
         elif source_info.rowcount == 0:
-            print("Le produit {} ne semble pas exister. Ressayez à nouveau".format(search))
+            print("Le produit {} ne semble pas exister. Ressayez à "
+                  "nouveau".format(search))
             self.find_substitute()
 
         for row in source_info:
@@ -228,21 +239,25 @@ class LineInterface:
             product_score = row['nutrition_grade_fr']
 
         # make the actual search for substitute product.
-        results = self.action.search_substitute(self.db, product_score, category_id)
+        results = self.action.search_substitute(self.db, product_score,
+                                                category_id)
 
         if results is None:
             print("\n Echec de la commande de recherche")
             return
 
         elif results.rowcount == 0:
-            print("\n Il n'y a pas d'alternatives mieux classées pour le produit {} à notre connaissance".format(search))
+            print("\n Il n'y a pas d'alternatives mieux classées pour "
+                  "le produit {} dans notre base de données.".format(search))
             return
 
-        print("\n Les subtituts possibles, de la même catégorie et avec un meilleur nutriscore, sont: \n")
+        print("\n Les subtituts possibles, de la même catégorie et avec un "
+              "meilleur nutriscore, sont: \n")
 
         for row in results:
             print("""
-            * {product_name} - nutriscore: {nutrition_grade_fr} - identifiant: {id}\n""".format(**row))
+            * {product_name} - nutriscore: {nutrition_grade_fr} - identifiant: 
+            {id}\n""".format(**row))
 
         self.display_record_submenu()
         self.choice(self.record_options)
@@ -254,7 +269,8 @@ class LineInterface:
 
         control = True
         while control:
-            id_sub = input("Quel est l'identifiant du substitut que vous voulez conserver ?: ")
+            id_sub = input("Quel est l'identifiant du substitut que vous "
+                           "voulez conserver ?: ")
 
             # check validity of input. Integer expected.
             control = self.check_type(id_sub)
@@ -264,7 +280,7 @@ class LineInterface:
 
         print("""
             Préférence enregistrée avec succès ! 
-        Vous pouvez la retrouver en consultant l'historique (menu principal -> consulter l'historique """)
+        Vous pouvez la retrouver en consultant l'historique (menu principal -> consulter l'historique) """)
 
     def explore_category(self):
         """Handle options menu for category search."""
@@ -272,7 +288,9 @@ class LineInterface:
 
         # populate dictionary of categories options if empty
         if len(self.categ_options) != (len(self.categories)+1):
-            for i in range(1, (len(self.categories)+1)):   # try to populate options dictionary
+
+            # try to populate options dictionary
+            for i in range(1, (len(self.categories)+1)):
                 key = str(i)
                 self.categ_options.setdefault(key, self.show_category)
 
@@ -284,7 +302,8 @@ class LineInterface:
     def show_category(self):
         """Show results of the queries for a specified category of products.
         Rely on categ_choice et categorie attributes to work.
-        If the query is succesfull, call for function to show details on a specific product."""
+        If the query is succesfull, call for function to show details on a
+        specific product."""
         index = int(self.categ_choice)-1
         look_for = self.categories[index]
 
@@ -299,9 +318,11 @@ class LineInterface:
             return
 
         else:
-            print("\n Voici les résultats pour la catégorie '{}': \n ".format(look_for))
+            print("\n Voici les résultats pour la catégorie '{}': "
+                  "\n ".format(look_for))
             for row in results:
-                print("""* {product_name} -- Nutriscore: {nutrition_grade_fr}  -- Identifiant: {id} \n""".format(**row))
+                print("""* {product_name} -- Nutriscore: {nutrition_grade_fr} 
+                 -- Identifiant: {id} \n""".format(**row))
 
         self.display_search_submenu()
         self.choice(self.search_options)
@@ -315,7 +336,8 @@ class LineInterface:
             return
 
         elif results.rowcount == 0:
-            print("\n L'historique ne contient aucun enregistrement pour l'instant. \n")
+            print("\n L'historique ne contient aucun enregistrement pour "
+                  "l'instant. \n")
             return
 
         else:

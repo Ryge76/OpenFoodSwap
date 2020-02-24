@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 import manageDB
 import prepareData
@@ -43,9 +44,15 @@ def populate_db():
 
 def install():
     """Manage first installation."""
-    populate_db()
-    with open("./ready.txt", 'w') as f:
-        f.write("Install done !")
+
+    try:
+        with open("./ready.txt", 'x') as f:
+            print("\n Début de l'installation...")
+            populate_db()
+            f.write("Install done !")
+            print("\n Installation terminée. ")
+    except FileExistsError:
+        print("\n Tout est prêt à fonctionner ! ")
 
 
 def user_choice():
@@ -60,8 +67,8 @@ def user_choice():
     choice = ''
     while choice not in choices:
         choice = input("""
-                Voulez-vous lancer le programme:
-                1. en ligne de commande
+                Comment voulez-vous lancer le programme ?
+                1. en ligne de commande 
                 2. en interface graphique
 
                 Votre choix (parmi {}) : """.format(choices))
@@ -89,18 +96,30 @@ def main():
     args = create_options()
 
     if args.install:
-        print("Je fais l'installation")
-        # install()
-        # user_choice()
+        print("""
+        Bonjour, bienvenue dans l'installation d'Open Foods SWAP !
+        
+        Je procède au remplissage initiale de la base de données...""")
+
+        try:
+            install()
+        except Exception as e:
+            print("\n Quelque chose s'est mal passé: \n {}".format(e))
+            sys.exit(0)
+        user_choice()
 
     elif args.GUI:
         # lancer interface graphique
-        print("Je lance l'interface graphique !")
+        print("\n Je lance l'interface graphique !")
         vg.main()
 
     else:
-        print("Je lance l'interface en ligne de commande")
-        vc.main()
+        print("""
+        -------------------------------
+        Bienvenue dans Open Food SWAP ! 
+        -------------------------------""""")
+        install()
+        user_choice()
 
 
 if __name__ == '__main__':

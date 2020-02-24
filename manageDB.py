@@ -154,11 +154,11 @@ class Command:
         if results is None:
             print("La categorie {} n'existe pas".format(category))
             return None
-
-        # get only the integer value of cursor_id tuple
-        id_number = results.fetchone()[0]
-        print("\n Pour la catégorie {}, l'id est {}.".format(categ_name,
-                                                             id_number))
+        else:
+            # get only the integer value of cursor_id tuple
+            id_number = results.fetchone()[0]
+            print("\n Pour la catégorie {}, l'id est {}.".format(categ_name,
+                                                                 id_number))
 
         db.close_cursor(results)
 
@@ -200,6 +200,7 @@ class Command:
         return results
 
     def find_by_category(self, db, category):
+        """Get products by category"""
         find_category = ("SELECT product_name, products.id,"
                          " nutrition_grade_fr, categ_name AS categorie "
                          "FROM products INNER JOIN categories "
