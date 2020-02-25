@@ -1,6 +1,6 @@
 import sys
 
-import manageDB
+import OpenFoodsSwap.manageDB as manageDB
 
 
 class LineInterface:
@@ -365,9 +365,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
