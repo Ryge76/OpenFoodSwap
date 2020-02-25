@@ -19,7 +19,6 @@ class Ofs(t.Tk):
         self.load_menu()
 
         self.start()  # initiate first view
-        pass
 
     def load_menu(self):
         pass
@@ -68,20 +67,20 @@ class Ofs(t.Tk):
     def welcome_screen(self):
         """Create welcome frame. """
 
-        welcome_frame = t.Frame(width=1024, height=768, background='yellow')
+        welcome_frame = t.Frame(width=1024, height=768)
         welcome_frame.pack()
 
         self.displayed_frame(welcome_frame)
 
         welcome = t.Label(welcome_frame, text="""
-        Bienvenue dans OpenFood SWAP !""", fg='blue')
+        Bienvenue dans OpenFood SWAP !""", fg='blue', bg='white')
         welcome.pack(side='top', fill=t.BOTH)
 
         sub_welcome = t.Label(welcome_frame, text="""
         Cette application vous permet d'avoir des infos sur ce que vous 
         consommez, et de trouver éventuellement 
         des équivalents plus sains ! ;-)
-        """)
+        """, bg='white')
         sub_welcome.pack()
 
         start_button = t.Button(welcome_frame, text="Cliquez pour commencer !",
@@ -90,36 +89,27 @@ class Ofs(t.Tk):
 
     def main_menu_screen(self):
         """Create main menu option screen"""
-
+        # display menu bar
         self.create_menu()
 
-        option_menu = t.Frame(width=1024, height=768, background='blue')
-        option_menu.pack(fill=t.BOTH)
+        # create main menu frame
+        main_menu = t.Frame(width=1024, height=768, background='blue')
+        main_menu.pack(fill=t.BOTH)
 
-        self.displayed_frame(option_menu)
+        self.displayed_frame(main_menu)
 
-        # create menu option with radio button.
-        choice = t.IntVar()
-        choice_menu_1 = t.Radiobutton(
-            option_menu,
-            text="Rechercher des informations sur un aliment en particulier",
-            variable=choice, value=1)
-        choice_menu_1.pack(fill=t.BOTH)
+        # create home widget
+        home_text = t.LabelFrame(main_menu,
+                                 text="Choisissez dans le menu <Action> ce que "
+                                      "vous souhaitez faire.",
+                                 fg='blue')
+        home_text.pack(fill=t.BOTH, side=t.TOP)
 
-        choice_menu_2 = t.Radiobutton(option_menu,
-                                      text="Explorer une catégorie d'aliments",
-                                      variable=choice, value=2)
-        choice_menu_2.pack(fill=t.BOTH)
-
-        choice_menu_3 = t.Radiobutton(
-            option_menu, text="Consulter l'historique de vos substitutions",
-            variable=choice, value=3)
-        choice_menu_3.pack(fill=t.BOTH)
-
-        choice_menu_4 = t.Radiobutton(
-            option_menu, text="Quitter l'application",
-            variable=choice, value=4)
-        choice_menu_4.pack(fill=t.BOTH)
+        # create canvas for image
+        bg_pic = t.PhotoImage(file='../src/images/aliments.png')
+        photo_widget = t.Label(home_text, image=bg_pic)
+        photo_widget.image = bg_pic
+        photo_widget.pack(fill=t.BOTH)
 
     def search_screen(self):
         pass
