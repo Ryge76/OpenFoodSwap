@@ -1,4 +1,6 @@
+
 import tkinter as t
+from pathlib import Path
 
 import manageDB
 
@@ -105,10 +107,17 @@ class Ofs(t.Tk):
                                  fg='blue')
         home_text.pack(fill=t.BOTH, side=t.TOP)
 
-        # create canvas for image
-        bg_pic = t.PhotoImage(file='./images/aliments.png')
+        # get absolute position of this module to reach src folder
+        current_path = Path.cwd()
+        if __name__ == "__main__":
+            image_path = current_path.parents[0]/'src/images/aliments.png'
+        else:
+            image_path = current_path/'src/images/aliments.png'
+
+        # picture in label
+        bg_pic = t.PhotoImage(file=image_path)
         photo_widget = t.Label(home_text, image=bg_pic)
-        photo_widget.image = bg_pic
+        photo_widget.image = bg_pic  # necessary: see tkinter documentation
         photo_widget.pack(fill=t.BOTH)
 
     def search_screen(self):
@@ -339,6 +348,7 @@ class DbAction:
         # display search options
         self.display_search_submenu()
         self.choice(self.search_options)
+
 
 def main():
     app = Ofs()
