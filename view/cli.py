@@ -1,6 +1,6 @@
 import sys
 
-import OpenFoodsSwap.manageDB as manageDB
+import manageDB
 
 
 class LineInterface:

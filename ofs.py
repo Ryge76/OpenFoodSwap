@@ -1,11 +1,11 @@
 import argparse
 import sys
 
-import OpenFoodsSwap.manageDB as manageDB
-import OpenFoodsSwap.prepareData as prepareData
-import OpenFoodsSwap.requestAPI as requestAPI
-import OpenFoodsSwap.view.ofs_gui as vg
-import OpenFoodsSwap.view.cli as vc
+import manageDB
+import prepareData
+import requestAPI
+import view.ofs_gui as vg
+import view.cli as vc
 
 
 def populate_db():

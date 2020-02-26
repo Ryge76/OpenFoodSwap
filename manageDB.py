@@ -1,5 +1,5 @@
 import mysql.connector as mc
-import OpenFoodsSwap.config as config
+import config
 
 
 class UseDB:

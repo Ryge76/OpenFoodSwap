@@ -1,6 +1,6 @@
 import tkinter as t
 
-import OpenFoodsSwap.manageDB as manageDB
+import manageDB
 
 
 class Ofs(t.Tk):
@@ -106,7 +106,7 @@ class Ofs(t.Tk):
         home_text.pack(fill=t.BOTH, side=t.TOP)
 
         # create canvas for image
-        bg_pic = t.PhotoImage(file='../src/images/aliments.png')
+        bg_pic = t.PhotoImage(file='./images/aliments.png')
         photo_widget = t.Label(home_text, image=bg_pic)
         photo_widget.image = bg_pic
         photo_widget.pack(fill=t.BOTH)
