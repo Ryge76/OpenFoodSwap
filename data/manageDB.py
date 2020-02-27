@@ -1,5 +1,5 @@
 import mysql.connector as mc
-import config
+from data import config
 
 
 class UseDB:

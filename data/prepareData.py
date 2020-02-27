@@ -97,7 +97,7 @@ class Parser:
 
 def sample():
     # creating a FoodAPI object required to use Parser
-    from requestAPI import FoodAPI
+    from data.requestAPI import FoodAPI
     data_set = FoodAPI()
     data_set.call_for('snacks', qt='50')
 

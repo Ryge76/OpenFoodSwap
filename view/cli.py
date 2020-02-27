@@ -1,6 +1,6 @@
 import sys
 
-import manageDB
+from data import manageDB
 
 
 class LineInterface:

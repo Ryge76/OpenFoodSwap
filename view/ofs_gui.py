@@ -2,7 +2,7 @@
 import tkinter as t
 from pathlib import Path
 
-import manageDB
+from data import manageDB
 
 
 class Ofs(t.Tk):

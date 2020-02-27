@@ -1,9 +1,7 @@
 import argparse
 import sys
 
-import manageDB
-import prepareData
-import requestAPI
+from data import manageDB, prepareData, requestAPI
 import view.ofs_gui as vg
 import view.cli as vc
 
